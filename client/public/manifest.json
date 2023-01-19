@@ -1,13 +1,15 @@
 {
+  "short_name": "HR Manager",
   "name": "hrManager",
   "version": "0.1.0",
   "description": "Your HR Manager",
   "background": {
     "service_worker": "background.js"
   },
+  "manifest_version": 3,
   "content_scripts": [
     {
-      "matches": ["https://web.whatsapp.com/"],
+      "matches": ["<all_urls>"],
       "js": ["contentScript.js"]
     }
   ],
@@ -17,9 +19,16 @@
       "matches": ["<all_urls>"]
     }
   ],
-  "manifest_version": 3,
+  "icons": {
+    "16": "favicon.ico",
+    "48": "logo192.png",
+   "128": "logo512.png"
+  },
+  "permissions": [
+    "tabs"
+  ],
   "action": {
     "default_title": "HR Manager",
-    "default_popup": "popup.html"
+    "default_popup": "index.html"
   }
 }
