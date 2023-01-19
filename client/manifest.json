@@ -1,0 +1,15 @@
+{
+    "name":"hrManager",
+    "version": "0.1.0",
+    "description":"Your HR Manager",
+    "background": {
+        "service_worker":"background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": ["https://web.whatsapp.com/"],
+            "js":["contentScript.js"]
+        }
+    ],
+    "manifest_version": 3
+}
