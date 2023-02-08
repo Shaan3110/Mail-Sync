@@ -1,17 +1,4 @@
-/**
-=========================================================
-* Soft UI Dashboard React - v4.0.0
-=========================================================
 
-* Product Page: https://www.creative-tim.com/product/soft-ui-dashboard-react
-* Copyright 2022 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
 
 import { useRef, useEffect, useState, useMemo } from "react";
 
@@ -34,7 +21,7 @@ import gradientChartLine from "assets/theme/functions/gradientChartLine";
 // GradientLineChart configurations
 import configs from "examples/Charts/LineCharts/GradientLineChart/configs";
 
-// Soft UI Dashboard React base styles
+
 import colors from "assets/theme/base/colors";
 
 function GradientLineChart({ title, description, height, chart }) {
