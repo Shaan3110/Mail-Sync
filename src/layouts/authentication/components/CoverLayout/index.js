@@ -23,8 +23,8 @@ function CoverLayout({ color, header, title, description, image, top, children }
       <DefaultNavbar
         action={{
           type: "external",
-          route: "https://creative-tim.com/product/soft-ui-dashboard-react",
-          label: "free download",
+          route: "/authenticate/sign-up",
+          label: "Sign Up",
           color: "dark",
         }}
       />
