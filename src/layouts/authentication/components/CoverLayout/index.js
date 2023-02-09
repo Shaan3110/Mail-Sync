@@ -24,7 +24,7 @@ function CoverLayout({ color, header, title, description, image, top, children }
         action={{
           type: "external",
           route: "/authenticate/sign-up",
-          label: "Sign Up",
+          label: "Documendation",
           color: "dark",
         }}
       />
