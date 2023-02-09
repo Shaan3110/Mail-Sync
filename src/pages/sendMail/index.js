@@ -133,18 +133,34 @@ function SendMail() {
         <SoftBox mb={2}>
           <SoftBox mb={1} ml={0.5}>
             <SoftTypography component="label" variant="caption" fontWeight="bold">
-              Email
+              Recipient
             </SoftTypography>
           </SoftBox>
-          <SoftInput type="email" placeholder="Email" name="email"/>
+          <SoftInput type="email" placeholder="Recipient" name="recipient"/>
         </SoftBox>
         <SoftBox mb={2}>
           <SoftBox mb={1} ml={0.5}>
             <SoftTypography component="label" variant="caption" fontWeight="bold">
-              Password
+              {multiple_send? "Group": "Sender"}
             </SoftTypography>
           </SoftBox>
-          <SoftInput type="password" placeholder="Password" name="email"/>
+          <SoftInput type="email" placeholder="Sender" name="sender"/>
+        </SoftBox>
+        <SoftBox mb={2}>
+          <SoftBox mb={1} ml={0.5}>
+            <SoftTypography component="label" variant="caption" fontWeight="bold">
+              Body
+            </SoftTypography>
+          </SoftBox>
+          <SoftInput type="text" placeholder="Body" name="sender" multiline rows={5}/>
+        </SoftBox>
+        <SoftBox mb={2}>
+          <SoftBox mb={1} ml={0.5}>
+            <SoftTypography component="label" variant="caption" fontWeight="bold">
+              Schedule
+            </SoftTypography>
+          </SoftBox>
+          <SoftInput type="text" placeholder="Schedule" name="schedule"/>
         </SoftBox>
         <SoftBox display="flex" alignItems="center">
           <Switch checked={multiple_send} onChange={handleSetmultiple_send} />
@@ -154,12 +170,12 @@ function SendMail() {
             onClick={handleSetmultiple_send}
             sx={{ cursor: "pointer", userSelect: "none" }}
           >
-            &nbsp;&nbsp;Remember me
+            &nbsp;&nbsp;Group
           </SoftTypography>
         </SoftBox>
         <SoftBox mt={4} mb={1}>
           <SoftButton variant="gradient" color="info" fullWidth type="submit">
-            sign in
+            Send
           </SoftButton>
         </SoftBox>
         <SoftBox mt={3} textAlign="center">
