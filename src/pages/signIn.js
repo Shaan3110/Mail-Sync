@@ -38,14 +38,14 @@ function SignIn() {
     if(submit_sign_in)
     {
         sign_in(send_data).then((res) => {
-          if (res.status === 200) {
+          if (res.data.status === "Success") {
             localStorage.setItem('token',res.data.jwt);
             navigate("/dashboard");
           }
-          // 401 if the user already exist on the database
-          else if (res?.status === 401) {
+          else if (res.data.message === "Invalid username or password!")
+          {
             seterror(true);
-            seterrormessage("Unauthorized");
+            seterrormessage(res.data.message);
           }
         })
         .catch((err) => {

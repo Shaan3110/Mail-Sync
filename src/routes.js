@@ -39,6 +39,7 @@ import CreditCard from "examples/Icons/CreditCard";
 import Cube from "examples/Icons/Cube";
 import SignIn from "pages/signIn";
 import Dashboard from "pages/mailView";
+import SendMail from "pages/sendMail";
 
 const routes = [
   {
@@ -59,6 +60,15 @@ const routes = [
   //   component: <Tables />,
   //   noCollapse: true,
   // },
+   {
+    type: "collapse",
+    name: "Send Mail",
+    key: "send",
+    route: "/send",
+    icon: <Office size="12px" />,
+    component: <SendMail />,
+    noCollapse: true,
+  },
   {
     type: "collapse",
     name: "Billing",
