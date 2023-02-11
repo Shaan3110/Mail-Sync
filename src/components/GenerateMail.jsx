@@ -20,12 +20,13 @@ import { useNavigate } from "react-router-dom";
 import { sign_in, verify_token } from "../apis/Authenticate";
 import moment from "moment";
 import MUIRichTextEditor from 'mui-rte'
+import { send_mail } from "../apis/Mail";
 
 const GenerateMail = () => {
   const [error, seterror] = useState(false);
   const [errormessage, seterrormessage] = useState("");
-  const [submit_login, setsubmit_login] = useState(false);
-  const [login_toggle, setlogin_toggle] = useState(false);
+  const [submit_generate, setsubmit_generate] = useState(false);
+  const [toggle_generate, settoggle_generate] = useState(false);
   const [loading, setloading] = useState(false);
   const [send_data, setsend_data] = useState({});
   const [groupGenerate, setgroupGenerate] = useState(false);
@@ -41,10 +42,11 @@ const GenerateMail = () => {
   const handleDateChange = (event) => setdate(event.target.value);
 
 
-  const send_login_details = async () => {
+  const send_generate_mail = async () => {
+    console.log(send_data)
     seterror(false);
     try {
-      let response = await sign_in(send_data.email, send_data.password);
+      let response = await send_mail(send_data.recipient,send_data.sender,send_data.subject,send_data.group,send_data.body,send_data.date);
       console.log(response);
       if (response.data.status === "Success") {
         localStorage.setItem("token", response.data.jwt);
@@ -73,16 +75,16 @@ const GenerateMail = () => {
     });
 
     // submit generate mail request
-    if (submit_login) {
-      send_login_details();
+    if (submit_generate) {
+      send_generate_mail();
     }
-  }, [login_toggle]);
+  }, [toggle_generate]);
 
   const handleSubmit = (values) => {
-    setsend_data([values.email, values.password]);
-    setsubmit_login(true);
-    setlogin_toggle(!login_toggle);
-    console.log(values);
+    setsend_data({recipient:values.recipient,sender:values.sender,subject:values.subject,group:group,body:body,date:date});
+    setsubmit_generate(true);
+    settoggle_generate(!toggle_generate);
+    // console.log(values);
   };
 
   const isNonMobile = useMediaQuery("(min-width:600px)");
@@ -96,6 +98,7 @@ const GenerateMail = () => {
     recipient: "",
     sender: "",
     subject: "",
+    group: []
   };
 
   return (
@@ -209,6 +212,9 @@ const GenerateMail = () => {
                   onClose={() => {
                     setGroup(false);
                   }}
+                  name="group"
+                  onChange={handleChange}
+                  value={values.group}
                   getOptionLabel={(option) => option}
                   options={["Group 1","Group 2","Group 3"]}
                   loading={groupLoading}
@@ -244,7 +250,7 @@ const GenerateMail = () => {
                 />
                 <TextField
                     id="datetime-local"
-                    label="Next appointment"
+                    label="Scheduled Date"
                     type="datetime-local"
                     sx={{ gridColumn: "span 4" }}
                     onChange={handleDateChange}
@@ -260,8 +266,9 @@ const GenerateMail = () => {
                 >
                   <MUIRichTextEditor 
                       label="Type something here..."
-                      onChange={(value)=> {
-                        setbody(value);
+                      onChange={(event)=> {
+                        console.log(event.getCurrentContent().getPlainText())
+                        setbody(event.getCurrentContent().getPlainText());
                       }}
                     />
                     </Stack>
