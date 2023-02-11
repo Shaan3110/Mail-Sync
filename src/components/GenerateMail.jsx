@@ -25,6 +25,8 @@ import { send_mail } from "../apis/Mail";
 const GenerateMail = () => {
   const [error, seterror] = useState(false);
   const [errormessage, seterrormessage] = useState("");
+  const [success, setsuccess] = useState(false);
+  const [successmessage, setsuccessmessage] = useState("");
   const [submit_generate, setsubmit_generate] = useState(false);
   const [toggle_generate, settoggle_generate] = useState(false);
   const [loading, setloading] = useState(false);
@@ -49,8 +51,9 @@ const GenerateMail = () => {
       let response = await send_mail(send_data.recipient,send_data.sender,send_data.subject,send_data.group,send_data.body,send_data.date);
       console.log(response);
       if (response.data.status === "Success") {
-        localStorage.setItem("token", response.data.jwt);
-        navigate("/dashboard");
+          setsuccess(true);
+          setsuccessmessage("The mail sent successfully")
+        
       } else if (response.data.message === "Invalid username or password!") {
         seterror(true);
         seterrormessage(response.data.message);
