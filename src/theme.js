@@ -162,6 +162,14 @@ export const themeSettings = (mode) => {
             },
           }),
     },
+    overrides: {
+      MUIRichTextEditor: {
+          root: {
+              marginTop: 20,
+              width: "80%"
+          }
+      }
+  },
     typography: {
       fontFamily: ["Poppins", "sans-serif"].join(","),
       fontSize: 12,

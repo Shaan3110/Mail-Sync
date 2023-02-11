@@ -38,7 +38,7 @@ const GenerateMail = () => {
 
 
   const handleGroupGenerate = () => setgroupGenerate(!groupGenerate);
-  const handleDateChange = (value) => setdate(value);
+  const handleDateChange = (event) => setdate(event.target.value);
 
 
   const send_login_details = async () => {
