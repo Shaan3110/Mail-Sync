@@ -41,7 +41,7 @@ const App = () => {
                   />
                   <Route
                     exact
-                    path="/dashboard/tickets"
+                    path="/dashboard/view/mails"
                     element={
                       <ProtectedRoute>
                         <TicketPage />

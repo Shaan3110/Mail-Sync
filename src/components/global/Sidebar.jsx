@@ -269,6 +269,12 @@ const Sidebar = () => {
           icon={<AccountTreeOutlinedIcon />}
         />
         <MenuItem
+          show_title="View Mail"
+          title="ViewMail"
+          to="/dashboard/view/mails"
+          icon={<AccountTreeOutlinedIcon />}
+        />
+        {/* <MenuItem
           show_title={"Events"}
           title="Events"
           to="/dashboard/scrums"
@@ -302,7 +308,7 @@ const Sidebar = () => {
           title="LineChart"
           to="/line"
           icon={<TimelineOutlinedIcon />}
-        />
+        /> */}
       </Box>
     </Box>
   );
