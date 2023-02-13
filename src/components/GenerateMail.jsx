@@ -7,7 +7,10 @@ import {
   Alert,
   AlertTitle,
   Autocomplete,
+  Button,
+  ButtonGroup,
   Checkbox,
+  Chip,
   CircularProgress,
   FormControlLabel,
   Stack,
@@ -29,22 +32,27 @@ const GenerateMail = () => {
   const [loading, setloading] = useState(false);
   const [send_data, setsend_data] = useState({});
   const [groupGenerate, setgroupGenerate] = useState(false);
-  const [group, setGroup] = useState(false);
+  const [group, setGroup] = useState([]);
   const [groupLoading, setgroupLoading] = useState(false);
+  const [preview, setpreview] = useState(false);
   const [date, setdate] = useState("2017-05-24T10:30");
   const navigate = useNavigate();
-  
-
 
   const handleGroupGenerate = () => setgroupGenerate(!groupGenerate);
   const handleDateChange = (event) => setdate(event.target.value);
 
-
   const send_generate_mail = async () => {
-    console.log(send_data)
+    console.log(send_data);
     seterror(false);
     try {
-      let response = await send_mail(send_data.recipient,send_data.sender,send_data.subject,send_data.group,send_data.body,send_data.date);
+      let response = await send_mail(
+        send_data.recipient,
+        send_data.sender,
+        send_data.subject,
+        send_data.group,
+        send_data.body,
+        send_data.date
+      );
       console.log(response);
       if (response.data.status === "Success") {
         // localStorage.setItem("token", response.data.jwt);
@@ -61,16 +69,16 @@ const GenerateMail = () => {
   };
 
   useEffect(() => {
-
     // verify token each time
-    verify_token().then((res) => {
-      if (res.data.status === "Fail") {
+    verify_token()
+      .then((res) => {
+        if (res.data.status === "Fail") {
+          navigate("/auth/login");
+        }
+      })
+      .catch((err) => {
         navigate("/auth/login");
-      }
-    })
-    .catch((err) => {
-      navigate("/auth/login");
-    });
+      });
 
     // submit generate mail request
     if (submit_generate) {
@@ -79,7 +87,15 @@ const GenerateMail = () => {
   }, [toggle_generate]);
 
   const handleSubmit = (values) => {
-    setsend_data({recipient:values.recipient,sender:values.sender,subject:values.subject,group:group,body:values.body,date:date});
+    console.log(group)
+    setsend_data({
+      recipient: values.recipient,
+      sender: values.sender,
+      subject: values.subject,
+      group: group,
+      body: values.body,
+      date: date,
+    });
     setsubmit_generate(true);
     settoggle_generate(!toggle_generate);
     // console.log(values);
@@ -91,14 +107,12 @@ const GenerateMail = () => {
     recipient: yup.string().required("required"),
     sender: yup.string(),
     subject: yup.string().required("required"),
-    body: yup.string().required("required")
   });
   const initialValues = {
     recipient: "",
     sender: "",
     subject: "",
-    group: [],
-    body: ""
+    body: "",
   };
 
   return (
@@ -178,6 +192,7 @@ const GenerateMail = () => {
                     variant="outlined"
                     type="email"
                     label="Recipient"
+                    disabled={preview}
                     onBlur={handleBlur}
                     onChange={handleChange}
                     value={values.recipient}
@@ -187,50 +202,46 @@ const GenerateMail = () => {
                     sx={{ width: "span 2" }}
                   />
                   <TextField
-                  fullWidth
-                  variant="outlined"
-                  type="sender"
-                  label="Sender"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.sender}
-                  name="sender"
-                  error={!!touched.sender && !!errors.sender}
-                  helperText={touched.sender && errors.sender}
-                  sx={{ gridColumn: "span 2" }}
-                />
+                    fullWidth
+                    variant="outlined"
+                    type="sender"
+                    label="Sender"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.sender}
+                    disabled={preview}
+                    name="sender"
+                    error={!!touched.sender && !!errors.sender}
+                    helperText={touched.sender && errors.sender}
+                    sx={{ gridColumn: "span 2" }}
+                  />
                 </Stack>
                 {
                   groupGenerate && <Autocomplete
-                  id="asynchronous-demo"
+                  value={group}
+                  onChange={(event, newValue) => {
+                    setGroup(newValue);
+                  }}
                   multiple
-                  sx={{ gridColumn: "span 4" }}
-                  open={group}
-                  onOpen={() => {
-                    setGroup(true);
-                  }}
-                  onClose={() => {
-                    setGroup(false);
-                  }}
-                  name="group"
-                  onChange={handleChange}
-                  value={values.group}
-                  getOptionLabel={(option) => option}
+                  id="tags-filled"
                   options={["Group 1","Group 2","Group 3"]}
-                  loading={groupLoading}
+                  freeSolo
+                  sx={{gridColumn: "span 4"}}
+                  renderTags={(value, getTagProps) =>
+                    value.map((option, index) => (
+                      <Chip
+                        variant="outlined"
+                        label={option}
+                        {...getTagProps({ index })}
+                      />
+                    ))
+                  }
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label="Groups"
-                      InputProps={{
-                        ...params.InputProps,
-                        endAdornment: (
-                          <React.Fragment>
-                            {groupLoading ? <CircularProgress color="inherit" size={20} /> : null}
-                            {params.InputProps.endAdornment}
-                          </React.Fragment>
-                        ),
-                      }}
+                      variant="outlined"
+                      label="Users"
+                      placeholder="Search"
                     />
                   )}
                 />
@@ -244,68 +255,88 @@ const GenerateMail = () => {
                   onChange={handleChange}
                   value={values.subject}
                   name="subject"
+                  disabled={preview}
                   error={!!touched.subject && !!errors.subject}
                   helperText={touched.subject && errors.subject}
                   sx={{ gridColumn: "span 4" }}
                 />
                 <TextField
-                    id="datetime-local"
-                    label="Scheduled Date"
-                    type="datetime-local"
+                  id="datetime-local"
+                  label="Scheduled Date"
+                  type="datetime-local"
+                  sx={{ gridColumn: "span 4" }}
+                  onChange={handleDateChange}
+                  value={date}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+                {!preview ? (
+                  <TextField
+                    id="outlined-multiline-static"
+                    fullWidth
+                    value={values.body}
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    variant="outlined"
+                    type="body"
+                    placeholder="Body"
+                    name="body"
+                    multiline
+                    rows={4}
+                    error={!!touched.body && !!errors.body}
+                    helperText={touched.body && errors.body}
                     sx={{ gridColumn: "span 4" }}
-                    onChange={handleDateChange}
-                    value={date}
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
                   />
-                  <Stack
-                  spacing={1}
-                  sx={{ gridColumn: "span 4", minHeight: 200, border:"2px solid #f5f5f5", borderRadius:"4px",padding:"10px 10px" }}
-                  direction="row"
-                >
-                  {/* <MUIRichTextEditor 
-                      label="Type something here..."
-                      onSave={save}
-                      inlineToolbar={true}
-                    /> */}
-                    <TextField
-                  fullWidth
-                  multiline
-                  value={values.body}
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  variant="outlined"
-                  type="body"
-                  placeholder="Body"
-                  name="body"
-                  error={!!touched.body && !!errors.body}
-                  helperText={touched.body && errors.body}
+                ) : (
+                  <div dangerouslySetInnerHTML={{ __html: values.body }} />
+                )}
+                <FormControlLabel
+                  control={<Checkbox />}
+                  label="Generate for group"
+                  onChange={handleGroupGenerate}
+                  value={groupGenerate}
                   sx={{ gridColumn: "span 4" }}
                 />
-                <div
-      dangerouslySetInnerHTML={{__html: values.body}}
-    />
-                    </Stack>
-                <FormControlLabel control={<Checkbox />} label="Generate for group" onChange={handleGroupGenerate} value={groupGenerate} sx={{ gridColumn: "span 4" }}/>
               </Box>
               <Box display="flex" justifyContent="end" mt="20px">
-                <LoadingButton
-                  type="submit"
-                  color="primary"
-                  variant="contained"
-                  loading={loading}
-                  loadingPosition="end"
+                <ButtonGroup
                   sx={{
-                    fontWeight: "bolder",
-                    textTransform: "none !important",
-                    marginBottom: "5px",
-                    width: "143px",
+                    width: "fit-content",
                   }}
-                  size="large"
                 >
-                  Generate Mail
-                </LoadingButton>
+                  <LoadingButton
+                    type="submit"
+                    color="primary"
+                    variant="contained"
+                    loading={loading}
+                    loadingPosition="end"
+                    sx={{
+                      fontWeight: "bolder",
+                      textTransform: "none !important",
+                      marginBottom: "5px",
+                      width: "143px",
+                    }}
+                    size="large"
+                  >
+                    Generate Mail
+                  </LoadingButton>
+                  <Button
+                    color="primary"
+                    variant="text"
+                    sx={{
+                      fontWeight: "bolder",
+                      textTransform: "none !important",
+                      marginBottom: "5px",
+                      marginLeft: "10px",
+                      width: "143px",
+                    }}
+                    size="large"
+                    onClick={()=> setpreview(!preview)}
+                  >
+                    Preview
+                  </Button>
+                </ButtonGroup>
               </Box>
               <Box
                 display={"flex"}
