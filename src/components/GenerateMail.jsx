@@ -49,8 +49,8 @@ const GenerateMail = () => {
       let response = await send_mail(send_data.recipient,send_data.sender,send_data.subject,send_data.group,send_data.body,send_data.date);
       console.log(response);
       if (response.data.status === "Success") {
-        localStorage.setItem("token", response.data.jwt);
-        navigate("/dashboard");
+        // localStorage.setItem("token", response.data.jwt);
+        // navigate("/dashboard");
       } else if (response.data.message === "Invalid username or password!") {
         seterror(true);
         seterrormessage(response.data.message);
@@ -81,7 +81,7 @@ const GenerateMail = () => {
   }, [toggle_generate]);
 
   const handleSubmit = (values) => {
-    setsend_data({recipient:values.recipient,sender:values.sender,subject:values.subject,group:group,body:body,date:date});
+    setsend_data({recipient:values.recipient,sender:values.sender,subject:values.subject,group:group,body:values.body,date:date});
     setsubmit_generate(true);
     settoggle_generate(!toggle_generate);
     // console.log(values);
@@ -93,12 +93,14 @@ const GenerateMail = () => {
     recipient: yup.string().required("required"),
     sender: yup.string(),
     subject: yup.string().required("required"),
+    body: yup.string().required("required")
   });
   const initialValues = {
     recipient: "",
     sender: "",
     subject: "",
-    group: []
+    group: [],
+    body: ""
   };
 
   return (
@@ -264,13 +266,28 @@ const GenerateMail = () => {
                   sx={{ gridColumn: "span 4", minHeight: 200, border:"2px solid #f5f5f5", borderRadius:"4px",padding:"10px 10px" }}
                   direction="row"
                 >
-                  <MUIRichTextEditor 
+                  {/* <MUIRichTextEditor 
                       label="Type something here..."
-                      onChange={(event)=> {
-                        console.log(event.getCurrentContent().getPlainText())
-                        setbody(event.getCurrentContent().getPlainText());
-                      }}
-                    />
+                      onSave={save}
+                      inlineToolbar={true}
+                    /> */}
+                    <TextField
+                  fullWidth
+                  multiline
+                  value={values.body}
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  variant="outlined"
+                  type="body"
+                  placeholder="Body"
+                  name="body"
+                  error={!!touched.body && !!errors.body}
+                  helperText={touched.body && errors.body}
+                  sx={{ gridColumn: "span 4" }}
+                />
+                <div
+      dangerouslySetInnerHTML={{__html: values.body}}
+    />
                     </Stack>
                 <FormControlLabel control={<Checkbox />} label="Generate for group" onChange={handleGroupGenerate} value={groupGenerate} sx={{ gridColumn: "span 4" }}/>
               </Box>
