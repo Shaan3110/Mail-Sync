@@ -2,9 +2,9 @@ import { Box } from '@mui/system'
 import React from 'react'
 import { Navbar } from '../components/global/Navbar';
 import Sidebar from '../components/global/Sidebar';
-import Tickets from '../components/Ticket/Tickets';
+import ViewMail from '../components/ViewMail/ViewMail';
 
-const TicketPage = () => {
+const ViewMailPage = () => {
 
   return (
     <div className="app">
@@ -15,11 +15,11 @@ const TicketPage = () => {
       >
         <Navbar />
         <Box m="20px">
-          <Tickets />
+          <ViewMail />
         </Box>
       </main>
     </div>
   )
 }
 
-export default TicketPage
+export default ViewMailPage

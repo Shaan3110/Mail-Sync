@@ -6,11 +6,12 @@ import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
 import ProfilesPage from "./pages/ProfilesPage";
 import ScrumsPage from "./pages/ScrumsPage";
-import TicketPage from "./pages/TicketPage";
 import GenerateMailPage from "./pages/GenerateMailPage";
 import FaqPage from "./pages/FaqPage";
 import LoginPage from "./pages/LoginPage";
 import RequestAccessPage from "./pages/RequestAccessPage";
+import ViewMailPage from "./pages/ViewMailPage";
+import GroupManagement from "./pages/GroupManagement";
 
 const App = () => {
 
@@ -44,7 +45,7 @@ const App = () => {
                     path="/dashboard/view/mails"
                     element={
                       <ProtectedRoute>
-                        <TicketPage />
+                        <ViewMailPage />
                       </ProtectedRoute>
                     }
                   />
@@ -59,10 +60,10 @@ const App = () => {
                   />
                   <Route
                     exact
-                    path="/dashboard/scrums"
+                    path="/dashboard/group"
                     element={
                       <ProtectedRoute>
-                        <ScrumsPage />
+                        <GroupManagement />
                       </ProtectedRoute>
                     }
                   />

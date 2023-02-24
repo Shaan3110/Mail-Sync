@@ -274,13 +274,13 @@ const Sidebar = () => {
           to="/dashboard/view/mails"
           icon={<AccountTreeOutlinedIcon />}
         />
-        {/* <MenuItem
-          show_title={"Events"}
-          title="Events"
-          to="/dashboard/scrums"
+        <MenuItem
+          show_title={"Group Management"}
+          title="GroupManagement"
+          to="/dashboard/group"
           icon={<CalendarTodayOutlinedIcon />}
         />
-
+        {/* 
         <Typography
           variant="h6"
           color={colors.grey[300]}

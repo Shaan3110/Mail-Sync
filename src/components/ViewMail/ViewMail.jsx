@@ -22,8 +22,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import PestControlIcon from "@mui/icons-material/PestControl";
-import TicketSearch from "./TicketSearch";
+import ViewMailSearch from "./ViewMailSearch";
 
 const ticket_columns = [
   { id: "status", label: "Status", maxWidth: 20 },
@@ -195,7 +194,7 @@ function Tickets() {
 
   return show && !loading ? (
     <>
-      <TicketSearch
+      <ViewMailSearch
         status={status}
         updateFilter={updateFilter}
         applyFilter={applyFilter}
@@ -231,7 +230,7 @@ function Tickets() {
     </>
   ) : (
     <>
-      <TicketSearch
+      <ViewMailSearch
         status={status}
         updateFilter={updateFilter}
         applyFilter={applyFilter}

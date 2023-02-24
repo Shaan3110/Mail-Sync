@@ -22,7 +22,7 @@ const Footer = () => {
             <p style={{
                 fontSize:"15px",
                 color: colors.grey[100]
-            }}>Made with ❤️ by <b style={{color:"#696cff"}}>MoleCule</b></p>
+            }}>Made with ❤️ by <b style={{color:"#696cff"}}>Mail Sync</b></p>
     </Box>
   )
 }

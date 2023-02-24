@@ -3,7 +3,7 @@ import Box from '@mui/material/Box'
 import React, { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 
-const TicketSearch = ({status,updateFilter, applyFilter}) => {
+const ViewMailSearch = ({status,updateFilter, applyFilter}) => {
 
   const navigate = useNavigate();
   
@@ -75,4 +75,4 @@ const TicketSearch = ({status,updateFilter, applyFilter}) => {
   )
 }
 
-export default TicketSearch
+export default ViewMailSearch
