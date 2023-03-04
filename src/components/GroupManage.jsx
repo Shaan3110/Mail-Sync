@@ -51,7 +51,7 @@ const GroupManage = () => {
   const [emails, setemails] = useState([]);
   const [data, setdata] = useState([]);
   const [curr_name, setcurr_name] = useState("");
-  const [curr_group, setcurr_group] = useState([]);
+  const [curr_ele, setcurr_ele] = useState({});
   const [submit_group_data, setsubmit_group_data] = useState(false);
   const [toggle_send_group_data, settoggle_send_group_data] = useState(false);
   const [add_group_data, setadd_group_data] = useState({});
@@ -225,7 +225,7 @@ const GroupManage = () => {
         });
         console.log(newArray);
         console.log(emails);
-        if (newArray.length > 0) {
+        if (emails.length !== undefined) {
           let filterArray = emails.push(...newArray);
           setemails(filterArray);
         }
@@ -259,8 +259,8 @@ const GroupManage = () => {
     group_description: yup.string().required("required"),
   });
   const initialValues = {
-    group_name: "",
-    group_description: "",
+    group_name: viewOn? curr_name:"",
+    group_description: viewOn? curr_ele.meta.description:"",
   };
 
   const style = {
@@ -555,7 +555,7 @@ const GroupManage = () => {
                     }}
                     onClick={() => {
                       setcurr_name(ele.identifier);
-                      setcurr_group(ele.meta.users);
+                      setcurr_ele(ele);
                       seterror(false);
                       setviewOn(true);
                       setupdateOpen(false);
@@ -883,8 +883,8 @@ const GroupManage = () => {
                   </StyledTableRow>
                 ) : null}
                 {!loading &&
-                  curr_group.length >= 1 &&
-                  curr_group
+                  curr_ele.meta.users.length >= 1 &&
+                  curr_ele.meta.users
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((row,index) => {
                       return (
