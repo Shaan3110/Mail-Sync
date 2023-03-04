@@ -167,6 +167,7 @@ const GroupManage = () => {
                   },
                 });
                 setdata(newData);
+                setshowNew(false);
               } else if (res.data.status === "Fail") {
                 seterror(true);
                 seterrormessage(res.data.message);
@@ -228,6 +229,11 @@ const GroupManage = () => {
         if (emails.length !== undefined) {
           let filterArray = emails.push(...newArray);
           setemails(filterArray);
+        }
+        else
+        {
+          seterror(true);
+          seterrormessage("Sorry the updation failed due to some internal server error. Please try again.")
         }
         console.log(emails);
       }
@@ -298,6 +304,7 @@ const GroupManage = () => {
         }}
         size="large"
         onClick={() => {
+          setfileParse(null);
           setshowNew(!showNew);
         }}
       >
@@ -556,6 +563,7 @@ const GroupManage = () => {
                     onClick={() => {
                       setcurr_name(ele.identifier);
                       setcurr_ele(ele);
+                      setfileParse(null);
                       seterror(false);
                       setviewOn(true);
                       setupdateOpen(false);
@@ -628,13 +636,13 @@ const GroupManage = () => {
                   variant="h3"
                   style={{ fontWeight: "bolder", marginBottom: "20px" }}
                 >
-                  Let's add a Group !
+                  Update an existing group properties !
                 </Typography>
                 <Typography
                   variant="h5"
                   style={{ fontWeight: "bolder", marginBottom: "20px" }}
                 >
-                  Please fill the group name and upload xml file for the same
+                  Update necessary details of the group
                 </Typography>
                 <Box
                   display={"flex"}
@@ -838,7 +846,7 @@ const GroupManage = () => {
               message={successmessage}
             />
           )}
-          <Snackbar
+          {/* <Snackbar
             open={true}
             autoHideDuration={6000}
             key={"bottom" + "right"}
@@ -847,7 +855,7 @@ const GroupManage = () => {
             <Alert severity="success" sx={{ width: "100%" }} variant="filled">
               This is a success message!
             </Alert>
-          </Snackbar>
+          </Snackbar> */}
           <TableContainer sx={{ maxHeight: 500 }}>
             <Table stickyHeader aria-label="sticky table">
               <TableHead sx={{ backgroundColor: "#000000" }}>
