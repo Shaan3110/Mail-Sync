@@ -17,12 +17,17 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { EditorState } from "draft-js";
+import { Editor } from "react-draft-wysiwyg";
+import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import LaunchIcon from "@mui/icons-material/Launch";
 import { useNavigate } from "react-router-dom";
 import { sign_in, verify_token } from "../apis/Authenticate";
 import moment from "moment";
 import { send_mail } from "../apis/Mail";
+import { convertToHTML } from 'draft-convert';
+import { get_all_groups } from "../apis/Group";
 
 const GenerateMail = () => {
   const [error, seterror] = useState(false);
@@ -31,8 +36,10 @@ const GenerateMail = () => {
   const [toggle_generate, settoggle_generate] = useState(false);
   const [loading, setloading] = useState(false);
   const [send_data, setsend_data] = useState({});
+  const [toggle_group, settoggle_group] = useState(false);
   const [groupGenerate, setgroupGenerate] = useState(false);
   const [group, setGroup] = useState([]);
+  const [group_options, setgroup_options] = useState([]);
   const [groupLoading, setgroupLoading] = useState(false);
   const [preview, setpreview] = useState(false);
   const [date, setdate] = useState("2017-05-24T10:30");
@@ -40,6 +47,10 @@ const GenerateMail = () => {
 
   const handleGroupGenerate = () => setgroupGenerate(!groupGenerate);
   const handleDateChange = (event) => setdate(event.target.value);
+
+  const [editorState, setEditorState] = useState(() =>
+    EditorState.createEmpty()
+  );
 
   const send_generate_mail = async () => {
     console.log(send_data);
@@ -68,6 +79,23 @@ const GenerateMail = () => {
     }
   };
 
+  React.useEffect(() => {
+    // get all groups
+    get_all_groups()
+      .then((res) => {
+        if (res.data.status === "Success") {
+          setgroup_options(res.data.groups);
+        } else if (res.data.status === "Fail") {
+          seterror(true);
+          seterrormessage(res.data.message);
+        }
+      })
+      .catch((err) => {
+        seterror(true);
+        seterrormessage("Internal Server Error");
+      });
+  }, [toggle_group]);
+
   useEffect(() => {
     // verify token each time
     verify_token()
@@ -87,13 +115,13 @@ const GenerateMail = () => {
   }, [toggle_generate]);
 
   const handleSubmit = (values) => {
-    console.log(group)
+    console.log(group);
     setsend_data({
       recipient: values.recipient,
       sender: values.sender,
       subject: values.subject,
       group: group,
-      body: values.body,
+      body: convertToHTML(editorState.getCurrentContent()),
       date: date,
     });
     setsubmit_generate(true);
@@ -112,7 +140,6 @@ const GenerateMail = () => {
     recipient: "",
     sender: "",
     subject: "",
-    body: "",
   };
 
   return (
@@ -216,36 +243,36 @@ const GenerateMail = () => {
                     sx={{ gridColumn: "span 2" }}
                   />
                 </Stack>
-                {
-                  groupGenerate && <Autocomplete
-                  value={group}
-                  onChange={(event, newValue) => {
-                    setGroup(newValue);
-                  }}
-                  multiple
-                  id="tags-filled"
-                  options={["Group 1","Group 2","Group 3"]}
-                  freeSolo
-                  sx={{gridColumn: "span 4"}}
-                  renderTags={(value, getTagProps) =>
-                    value.map((option, index) => (
-                      <Chip
+                {groupGenerate && (
+                  <Autocomplete
+                    value={group}
+                    onChange={(event, newValue) => {
+                      setGroup(newValue);
+                    }}
+                    multiple
+                    id="tags-filled"
+                    options={group_options.map((option)=> option.identifier)}
+                    freeSolo
+                    sx={{ gridColumn: "span 4" }}
+                    renderTags={(value, getTagProps) =>
+                      value.map((option, index) => (
+                        <Chip
+                          variant="outlined"
+                          label={option}
+                          {...getTagProps({ index })}
+                        />
+                      ))
+                    }
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
                         variant="outlined"
-                        label={option}
-                        {...getTagProps({ index })}
+                        label="Users"
+                        placeholder="Search"
                       />
-                    ))
-                  }
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      variant="outlined"
-                      label="Users"
-                      placeholder="Search"
-                    />
-                  )}
-                />
-                }
+                    )}
+                  />
+                )}
                 <TextField
                   fullWidth
                   variant="outlined"
@@ -271,26 +298,20 @@ const GenerateMail = () => {
                     shrink: true,
                   }}
                 />
-                {!preview ? (
-                  <TextField
-                    id="outlined-multiline-static"
-                    fullWidth
-                    value={values.body}
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    variant="outlined"
-                    type="body"
-                    placeholder="Body"
-                    name="body"
-                    multiline
-                    rows={4}
-                    error={!!touched.body && !!errors.body}
-                    helperText={touched.body && errors.body}
-                    sx={{ gridColumn: "span 4" }}
+                <Stack
+                  spacing={1}
+                  sx={{ gridColumn: "span 4",height:"50vh" }}
+                  direction="row"
+                >
+                  <Editor
+                    editorState={editorState}
+                    onEditorStateChange={setEditorState}
+                    wrapperClassName="wrapper-light-class"
+                    editorClassName="editor-light-class"
+                    toolbarClassName="toolbar-light-class"
+                    
                   />
-                ) : (
-                  <div dangerouslySetInnerHTML={{ __html: values.body }} />
-                )}
+                </Stack>
                 <FormControlLabel
                   control={<Checkbox />}
                   label="Generate for group"
@@ -332,7 +353,7 @@ const GenerateMail = () => {
                       width: "143px",
                     }}
                     size="large"
-                    onClick={()=> setpreview(!preview)}
+                    onClick={() => setpreview(!preview)}
                   >
                     Preview
                   </Button>
