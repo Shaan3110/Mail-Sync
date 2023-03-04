@@ -50,3 +50,27 @@ export const delete_group = async (name) => {
         return error.response;
     }
 };
+
+
+export const update_group = async (oldname,name,description,emails) => {
+
+    console.log(name);
+    try {
+        const response = await axios.post(
+              ' /groups/entity/update', {
+                domain:"community",
+                identifier:oldname,
+                update:{
+                    identifier:name,
+                    meta: {
+                        "description":description,
+                        "users":emails
+                    }
+                }
+            });
+        return response;
+    } catch (error) {
+        console.log(error);
+        return error.response;
+    }
+};
