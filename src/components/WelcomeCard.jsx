@@ -34,7 +34,7 @@ const WelcomeCard = () => {
             width: "100%",
           }}
         >
-          Congratulations {localStorage.getItem("username").split(" ")[0]}! 🎉
+          Congratulations {"Admin"}! 🎉
         </Typography>
         <Typography
           color={colors.grey[100]}
