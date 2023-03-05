@@ -58,8 +58,8 @@ const GenerateMail = () => {
     console.log(schedule_main_data);
     seterror(false);
     try {
+      debugger;
           let response;
-          debugger;
           if(groupGenerate)
           {
             response=await get_group_users(group)
@@ -68,9 +68,11 @@ const GenerateMail = () => {
                 if(response.data.contains)
                 {
                   response.data.contains.map(ele => {
-                    updatedGroups.push(ele.child)
+                    updatedGroups.push(ele.child.identifier)
                   })
                 }
+                let set_receipients = new Set(updatedGroups);
+                updatedGroups = [...set_receipients];
                 debugger;
                 setrecipients(updatedGroups);
               } else if (response.data.status === "Fail") {
@@ -138,7 +140,9 @@ const GenerateMail = () => {
 
   const handleSubmit = (values) => {
     console.log(group);
-    setrecipients([values.recipient]);
+    let newRecipients = [values.recipient];
+    debugger;
+    setrecipients(newRecipients);
     setschedule_main_data({...values,
       date:date,
       body:convertToHTML(editorState.getCurrentContent())});
