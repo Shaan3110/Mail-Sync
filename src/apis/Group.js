@@ -16,7 +16,7 @@ export const get_all_groups = async () => {
     }
 };
 
-export const add_group = async (name,description,emails) => {
+export const add_group = async (name,description) => {
 
     try {
         const response = await axios.post(
@@ -25,7 +25,6 @@ export const add_group = async (name,description,emails) => {
                 name:name,
                 meta: {
                     "description":description,
-                    "users":emails
                 }
             });
         return response;
@@ -52,22 +51,72 @@ export const delete_group = async (name) => {
 };
 
 
-export const update_group = async (oldname,name,description,emails) => {
+export const update_group = async (oldname,name,description) => {
 
     console.log(name);
     try {
         const response = await axios.post(
-              ' /groups/entity/update', {
+              '/groups/entity/update', {
                 domain:"community",
                 identifier:oldname,
                 update:{
                     identifier:name,
                     meta: {
                         "description":description,
-                        "users":emails
                     }
                 }
             });
+        return response;
+    } catch (error) {
+        console.log(error);
+        return error.response;
+    }
+};
+
+
+export const add_user = async (email) => {
+
+    try {
+        const response = await axios.post(
+              '/groups/user/add', {
+                domain: "community",
+                name:email
+                });
+        return response;
+    } catch (error) {
+        console.log(error);
+        return error.response;
+    }
+};
+
+
+export const get_group_users = async (name) => {
+
+    try {
+        const response = await axios.post(
+              '/groups/nested/get', {
+                domain: "community",
+                group:name,
+                meta:true
+                });
+        return response;
+    } catch (error) {
+        console.log(error);
+        return error.response;
+    }
+};
+
+
+
+export const add_group_child = async (name,description,email) => {
+
+    try {
+        const response = await axios.post(
+              '/groups/nest', {
+                domain: "community",
+                parent: name,
+                child: email,
+                });
         return response;
     } catch (error) {
         console.log(error);

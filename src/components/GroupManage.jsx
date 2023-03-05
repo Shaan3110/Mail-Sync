@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   ButtonGroup,
+  Chip,
   IconButton,
   Modal,
   Skeleton,
@@ -34,11 +35,15 @@ import { Formik } from "formik";
 import { LoadingButton } from "@mui/lab";
 import * as yup from "yup";
 import readXlsxFile from "read-excel-file";
+import PersonIcon from '@mui/icons-material/Person';
 import { verify_token } from "../apis/Authenticate";
 import {
   add_group,
+  add_group_child,
+  add_user,
   delete_group,
   get_all_groups,
+  get_group_users,
   update_group,
 } from "../apis/Group";
 
@@ -52,6 +57,7 @@ const GroupManage = () => {
   const [data, setdata] = useState([]);
   const [curr_name, setcurr_name] = useState("");
   const [curr_ele, setcurr_ele] = useState({});
+  const [group_users, setgroup_users] = useState([]);
   const [submit_group_data, setsubmit_group_data] = useState(false);
   const [toggle_send_group_data, settoggle_send_group_data] = useState(false);
   const [add_group_data, setadd_group_data] = useState({});
@@ -74,7 +80,8 @@ const GroupManage = () => {
 
   const ticket_columns = [
     { id: "sno", label: "S No", maxWidth: 20 },
-    { id: "email", label: "Email", maxWidth: 20 },
+    { id: "identifier", label: "Email", maxWidth: 20 },
+    { id: "type", label: "Type", maxWidth: 20 },
   ];
 
   const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -146,14 +153,35 @@ const GroupManage = () => {
       });
   }, [toggle_authentication]);
 
+
+  React.useEffect(() => {
+    // get all groups
+    if(viewOn)
+    {
+      get_group_users(curr_name)
+      .then((res) => {
+        if (res.data.status === "Success") {
+          setgroup_users(res.data.contains);
+        } else if (res.data.status === "Fail") {
+          seterror(true);
+          seterrormessage(res.data.message);
+        }
+      })
+      .catch((err) => {
+        seterror(true);
+        seterrormessage("Internal Server Error");
+      });
+    }
+    
+  }, [viewOn]);
+
   React.useEffect(() => {
     if (submit_group_data) {
-      debugger;
+      // debugger;
       !viewOn
         ? add_group(
             add_group_data.name,
             add_group_data.description,
-            add_group_data.emails
           )
             .then((res) => {
               if (res.data.status === "Success") {
@@ -168,6 +196,32 @@ const GroupManage = () => {
                 });
                 setdata(newData);
                 setshowNew(false);
+                add_user(add_group_data.email).then((res) => {
+                  if (res.data.status === "Success") {
+                    add_group_child(curr_name,
+                      add_group_data.description,
+                      add_group_data.email).then((res) => {
+                        if (res.data.status === "Success") {
+                          setsuccess(true);
+                          setsuccessmessage("User uploaded successfully")
+                        } else if (res.data.status === "Fail") {
+                          seterror(true);
+                          seterrormessage(res.data.message);
+                        }
+                      })
+                      .catch((err) => {
+                        seterror(true);
+                        seterrormessage("Internal Server Error");
+                      });
+                  } else if (res.data.status === "Fail") {
+                    seterror(true);
+                    seterrormessage(res.data.message);
+                  }
+                })
+                .catch((err) => {
+                  seterror(true);
+                  seterrormessage("Internal Server Error");
+                });
               } else if (res.data.status === "Fail") {
                 seterror(true);
                 seterrormessage(res.data.message);
@@ -180,13 +234,40 @@ const GroupManage = () => {
         : update_group(
             curr_name,
             update_group_data.name,
-            update_group_data.description,
-            update_group_data.emails
+            update_group_data.description
           )
             .then((res) => {
               if (res.data.status === "Success") {
                 setviewOn(false);
-                settoggle_authentication(!toggle_authentication);
+                add_user(update_group_data.email).then((res) => {
+                  if (res.data.status === "Success") {
+                    add_group_child(curr_name,
+                      update_group_data.description,
+                      update_group_data.email).then((res) => {
+                        if (res.data.status === "Success") {
+                          setsuccess(true);
+                          setsuccessmessage("User uploaded successfully")
+                        } else if (res.data.status === "Fail") {
+                          seterror(true);
+                          seterrormessage(res.data.message);
+                        }
+                      })
+                      .catch((err) => {
+                        seterror(true);
+                        seterrormessage("Internal Server Error");
+                      });
+                      settoggle_authentication(!toggle_authentication);
+                  } else if (res.data.status === "Fail") {
+                    seterror(true);
+                    seterrormessage(res.data.message);
+                  }
+                })
+                .catch((err) => {
+                  seterror(true);
+                  seterrormessage("Internal Server Error");
+                });
+                
+                
               } else if (res.data.status === "Fail") {
                 seterror(true);
                 seterrormessage(res.data.message);
@@ -216,42 +297,42 @@ const GroupManage = () => {
   };
 
   const handleSubmit = (values) => {
-    debugger;
-    setemails([]);
-    readXlsxFile(fileParse).then((rows) => {
-      for (const key in rows) {
-        console.log(rows[key]);
-        let newArray = rows[key].filter((ele) => {
-          return ele.includes("@");
-        });
-        console.log(newArray);
-        console.log(emails);
-        if (emails.length !== undefined) {
-          let filterArray = emails.push(...newArray);
-          setemails(filterArray);
-        }
-        else
-        {
-          seterror(true);
-          seterrormessage("Sorry the updation failed due to some internal server error. Please try again.")
-        }
-        console.log(emails);
-      }
+    // debugger;
+    // setemails([]);
+    // readXlsxFile(fileParse).then((rows) => {
+    //   for (const key in rows) {
+    //     console.log(rows[key]);
+    //     let newArray = rows[key].filter((ele) => {
+    //       return ele.includes("@");
+    //     });
+    //     console.log(newArray);
+    //     console.log(emails);
+    //     if (emails.length !== undefined) {
+    //       let filterArray = emails.push(...newArray);
+    //       setemails(filterArray);
+    //     }
+    //     else
+    //     {
+    //       seterror(true);
+    //       seterrormessage("Sorry the updation failed due to some internal server error. Please try again.")
+    //     }
+    //     console.log(emails);
+    //   }
       !viewOn
         ? setadd_group_data({
             name: values.group_name,
             description: values.group_description,
-            emails: emails,
+            email: values.email,
           })
         : setupdate_group_data({
             name: values.group_name,
             description: values.group_description,
-            emails: emails,
+            email: values.email,
           });
 
       setsubmit_group_data(true);
       settoggle_send_group_data(!toggle_send_group_data);
-    });
+    // });
     console.log(emails);
     console.log(values);
 
@@ -263,10 +344,12 @@ const GroupManage = () => {
   const checkoutSchema = yup.object().shape({
     group_name: yup.string().required("required"),
     group_description: yup.string().required("required"),
+    email: yup.string().required("required"),
   });
   const initialValues = {
     group_name: viewOn? curr_name:"",
     group_description: viewOn? curr_ele.meta.description:"",
+    email: "",
   };
 
   const style = {
@@ -408,7 +491,31 @@ const GroupManage = () => {
                       sx={{ width: "100%" }}
                     />
                   </Stack>
-                  <Typography
+                  <Stack
+                    spacing={1}
+                    sx={{ width: "100%", marginTop: "10px" }}
+                    direction="row"
+                  >
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      type="text"
+                      label="Email ID"
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      value={values.email}
+                      name="email"
+                      error={
+                        !!touched.email &&
+                        !!errors.email
+                      }
+                      helperText={
+                        touched.email && errors.email
+                      }
+                      sx={{ width: "100%" }}
+                    />
+                  </Stack>
+                  {/* <Typography
                     variant="h5"
                     style={{ fontWeight: "bolder", margin: "20px 0px" }}
                   >
@@ -449,7 +556,7 @@ const GroupManage = () => {
                         }}
                       />
                     </Button>
-                  </Stack>
+                  </Stack> */}
                 </Box>
                 <Box display="flex" justifyContent="end" mt="20px">
                   <LoadingButton
@@ -690,7 +797,31 @@ const GroupManage = () => {
                       sx={{ width: "100%" }}
                     />
                   </Stack>
-                  <Typography
+                  <Stack
+                    spacing={1}
+                    sx={{ width: "100%", marginTop: "10px" }}
+                    direction="row"
+                  >
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      type="text"
+                      label="Email ID"
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      value={values.email}
+                      name="email"
+                      error={
+                        !!touched.email &&
+                        !!errors.email
+                      }
+                      helperText={
+                        touched.email && errors.email
+                      }
+                      sx={{ width: "100%" }}
+                    />
+                  </Stack>
+                  {/* <Typography
                     variant="h5"
                     style={{ fontWeight: "bolder", margin: "20px 0px" }}
                   >
@@ -731,7 +862,7 @@ const GroupManage = () => {
                         }}
                       />
                     </Button>
-                  </Stack>
+                  </Stack> */}
                 </Box>
                 <Box display="flex" justifyContent="end" mt="20px">
                   <LoadingButton
@@ -890,9 +1021,13 @@ const GroupManage = () => {
                     })}
                   </StyledTableRow>
                 ) : null}
-                {!loading &&
-                  curr_ele.meta.users.length >= 1 &&
-                  curr_ele.meta.users
+                {
+                  console.log(group_users)
+                }
+                {
+                !loading &&
+                  group_users.length >= 1 &&
+                  group_users
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((row,index) => {
                       return (
@@ -907,6 +1042,7 @@ const GroupManage = () => {
                             
                           }
                           {ticket_columns.map((column) => {
+                            // debugger;
                             return (
                               <StyledTableCell
                                 key={index}
@@ -916,8 +1052,13 @@ const GroupManage = () => {
                                   
                                     index+1
 
-                                ) : (
-                                  row
+                                ) : column.id === "type" ? (
+                                  <Chip
+                                    label={row?.child?.[column?.id]}
+                                    endIcon={<PersonIcon />}
+                                  />
+                                ):(
+                                  row?.child?.[column?.id]
                                 )}
                               </StyledTableCell>
                             );

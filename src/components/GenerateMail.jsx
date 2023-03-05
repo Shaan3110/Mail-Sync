@@ -26,19 +26,21 @@ import { useNavigate } from "react-router-dom";
 import { sign_in, verify_token } from "../apis/Authenticate";
 import moment from "moment";
 import { send_mail } from "../apis/Mail";
-import { convertToHTML } from 'draft-convert';
-import { get_all_groups } from "../apis/Group";
+import { convertToHTML } from "draft-convert";
+import { get_all_groups, get_group_users } from "../apis/Group";
 
 const GenerateMail = () => {
   const [error, seterror] = useState(false);
   const [errormessage, seterrormessage] = useState("");
   const [submit_generate, setsubmit_generate] = useState(false);
   const [toggle_generate, settoggle_generate] = useState(false);
+  const [recipients, setrecipients] = useState([]);
+  const [curr_group, setcurr_group] = useState("");
   const [loading, setloading] = useState(false);
-  const [send_data, setsend_data] = useState({});
+  const [schedule_main_data, setschedule_main_data] = useState({});
   const [toggle_group, settoggle_group] = useState(false);
   const [groupGenerate, setgroupGenerate] = useState(false);
-  const [group, setGroup] = useState([]);
+  const [group, setGroup] = useState("");
   const [group_options, setgroup_options] = useState([]);
   const [groupLoading, setgroupLoading] = useState(false);
   const [preview, setpreview] = useState(false);
@@ -53,22 +55,42 @@ const GenerateMail = () => {
   );
 
   const send_generate_mail = async () => {
-    console.log(send_data);
+    console.log(schedule_main_data);
     seterror(false);
     try {
-      let response = await send_mail(
-        send_data.recipient,
-        send_data.sender,
-        send_data.subject,
-        send_data.group,
-        send_data.body,
-        send_data.date
+          let response;
+          debugger;
+          if(groupGenerate)
+          {
+            response=await get_group_users(group)
+              if (response.data.status === "Success") {
+                let updatedGroups = recipients;
+                if(response.data.contains)
+                {
+                  response.data.contains.map(ele => {
+                    updatedGroups.push(ele.child)
+                  })
+                }
+                debugger;
+                setrecipients(updatedGroups);
+              } else if (response.data.status === "Fail") {
+                seterror(true);
+                seterrormessage(response.data.message);
+              }
+          }
+          
+      response = await send_mail(
+        recipients,
+        schedule_main_data.sender,
+        schedule_main_data.subject,
+        schedule_main_data.body,
+        schedule_main_data.date
       );
       console.log(response);
       if (response.data.status === "Success") {
         // localStorage.setItem("token", response.data.jwt);
         // navigate("/dashboard");
-      } else if (response.data.message === "Invalid username or password!") {
+      } else if (response.data.status === "Fail") {
         seterror(true);
         seterrormessage(response.data.message);
       }
@@ -116,16 +138,14 @@ const GenerateMail = () => {
 
   const handleSubmit = (values) => {
     console.log(group);
-    setsend_data({
-      recipient: values.recipient,
-      sender: values.sender,
-      subject: values.subject,
-      group: group,
-      body: convertToHTML(editorState.getCurrentContent()),
-      date: date,
-    });
-    setsubmit_generate(true);
-    settoggle_generate(!toggle_generate);
+    setrecipients([values.recipient]);
+    setschedule_main_data({...values,
+      date:date,
+      body:convertToHTML(editorState.getCurrentContent())});
+      setsubmit_generate(true);
+      settoggle_generate(!toggle_generate);
+      send_generate_mail();
+    console.log(recipients);
     // console.log(values);
   };
 
@@ -244,32 +264,17 @@ const GenerateMail = () => {
                   />
                 </Stack>
                 {groupGenerate && (
+                
                   <Autocomplete
-                    value={group}
                     onChange={(event, newValue) => {
                       setGroup(newValue);
                     }}
-                    multiple
-                    id="tags-filled"
-                    options={group_options.map((option)=> option.identifier)}
-                    freeSolo
+                    id="free-solo-demo"
                     sx={{ gridColumn: "span 4" }}
-                    renderTags={(value, getTagProps) =>
-                      value.map((option, index) => (
-                        <Chip
-                          variant="outlined"
-                          label={option}
-                          {...getTagProps({ index })}
-                        />
-                      ))
-                    }
+                    freeSolo
+                    options={group_options.map((option) => option.identifier)}
                     renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        variant="outlined"
-                        label="Users"
-                        placeholder="Search"
-                      />
+                      <TextField {...params} label="Groups" />
                     )}
                   />
                 )}
@@ -300,7 +305,7 @@ const GenerateMail = () => {
                 />
                 <Stack
                   spacing={1}
-                  sx={{ gridColumn: "span 4",height:"50vh" }}
+                  sx={{ gridColumn: "span 4", height: "50vh" }}
                   direction="row"
                 >
                   <Editor
@@ -309,7 +314,6 @@ const GenerateMail = () => {
                     wrapperClassName="wrapper-light-class"
                     editorClassName="editor-light-class"
                     toolbarClassName="toolbar-light-class"
-                    
                   />
                 </Stack>
                 <FormControlLabel

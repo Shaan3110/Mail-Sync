@@ -2,17 +2,18 @@ import axios from "axios";
 
 
 //send request for generate mail
-export const send_mail = async (recipient,sender,subject,group,body,date) => {
+export const send_mail = async (recipient,sender,subject,body,date) => {
 
     // console.log(date)
     try {
         const response = await axios.post(
-              '/mail/schedule', {
-                recipient:recipient,
+              '/mail/batch/schedule', {
+                recipients:recipient,
                 sender:sender,
                 subject:subject,
                 body: body,
-                date_time:date+"+05:30"
+                date_time:date+"+05:30",
+                initiator:"admin"
             });
         return response;
     } catch (error) {
