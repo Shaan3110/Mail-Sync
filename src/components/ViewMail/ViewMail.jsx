@@ -28,7 +28,6 @@ import { get_mails } from "../../apis/Mail";
 const ticket_columns = [
   { id: "status", label: "Status", maxWidth: 20 },
   { id: "subject", label: "Subject", maxWidth: 20 },
-  { id: "body", label: "Body", minWidth: 150, align: "center" },
   { id: "recipient", label: "Recipient", minWidth: 10, align: "center" },
   { id: "sender", label: "Sender", minWidth: 50, align: "center" },
   { id: "date_time", label: "Date", minWidth: 50, align: "center" },
@@ -257,19 +256,41 @@ function Tickets() {
                             >
                               {column.id === "status" ? (
                                 <Box
-                                  sx={{
+                                  sx={value!=="Scheduled"?{
                                     width: "100px",
                                     margin:"10px 5px",
                                     padding:"5px 5px",
                                     display:"flex",
                                     alignItems:"center",
                                     justifyContent:"center",
-                                    color: value === "success" ? "#71dd37": "#ff3e1d",
-                                    border: value === "success" ? "1.5px solid #71dd37": "1.5px solid #ff3e1d",
-                                    borderRadius:"5px"
+                                    color:"#fff",
+                                    backgroundColor: value.startsWith("Sent") ? "#71dd37": "#ff3e1d",
+                                    border: value.startsWith("Sent") ? "1.5px solid #71dd37": "1.5px solid #ff3e1d",
+                                    borderRadius:"5px",
+                                    fontWeight:"bolder"
+                                  }:
+                                  {
+                                    width: "100px",
+                                    margin:"10px 5px",
+                                    padding:"5px 5px",
+                                    display:"flex",
+                                    alignItems:"center",
+                                    justifyContent:"center",
+                                    color:"#fff",
+                                    backgroundColor: "#FF5733",
+                                    border: "1.5px solid #FF5733",
+                                    borderRadius:"5px",
+                                    fontWeight:"bolder"
                                   }}
                                 >
-                                {value.charAt(0).toUpperCase() + value.slice(1)}
+                                {
+                                  value === "Sent [OK]" ?
+                                  "Success"
+                                  : 
+                                  value === "Scheduled" ?
+                                  (value) :
+                                  "Error"
+                                }
                                 </Box>
                               ) : (
                                 // <Box

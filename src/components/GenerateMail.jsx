@@ -13,6 +13,7 @@ import {
   Chip,
   CircularProgress,
   FormControlLabel,
+  Snackbar,
   Stack,
   TextField,
   Typography,
@@ -32,6 +33,8 @@ import { get_all_groups, get_group_users } from "../apis/Group";
 const GenerateMail = () => {
   const [error, seterror] = useState(false);
   const [errormessage, seterrormessage] = useState("");
+  const [success, setsuccess] = useState(false);
+  const [successmessage, setsuccessmessage] = useState("");
   const [submit_generate, setsubmit_generate] = useState(false);
   const [toggle_generate, settoggle_generate] = useState(false);
   const [recipients, setrecipients] = useState([]);
@@ -90,8 +93,8 @@ const GenerateMail = () => {
       );
       console.log(response);
       if (response.data.status === "Success") {
-        // localStorage.setItem("token", response.data.jwt);
-        // navigate("/dashboard");
+        setsuccess(true);
+        setsuccessmessage("Mail successfully scheduled !")
       } else if (response.data.status === "Fail") {
         seterror(true);
         seterrormessage(response.data.message);
@@ -174,6 +177,16 @@ const GenerateMail = () => {
         padding: "5px 40px",
       }}
     >
+      <Snackbar
+          open={success}
+          autoHideDuration={6000}
+          key={"bottom" + "right"}
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        >
+          <Alert severity="success" sx={{ width: "100%" }} variant="filled">
+            {successmessage}
+          </Alert>
+        </Snackbar>
       <Box
         width={"100%"}
         maxWidth="80vw"
@@ -297,7 +310,7 @@ const GenerateMail = () => {
                 />
                 <TextField
                   id="datetime-local"
-                  label="Scheduled Date"
+                  label="Scheduled Date based on UTC"
                   type="datetime-local"
                   sx={{ gridColumn: "span 4" }}
                   onChange={handleDateChange}
