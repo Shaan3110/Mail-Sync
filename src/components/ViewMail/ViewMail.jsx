@@ -23,6 +23,7 @@ import {
   Typography,
 } from "@mui/material";
 import ViewMailSearch from "./ViewMailSearch";
+import { get_mails } from "../../apis/Mail";
 
 const ticket_columns = [
   { id: "status", label: "Status", maxWidth: 20 },
@@ -57,72 +58,7 @@ function Tickets() {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [loading, setloading] = React.useState(false);
-  const [data, setdata] = React.useState([
-    {
-      id:"63e7cdd1b8af1921c49dfad8",
-      status:"failure",
-      subject:"Hey",
-      body:"<h1>Hi</h1>",
-      sender:"community@inccrew.com",
-      recipient:"hitarasigan0987654321@gmail.com",
-      date_time:"2023-12-11T17:18:00.000Z"
-    },
-    {
-      id:"63e7cdd1b8af1921c49dfad8",
-      status:"failure",
-      subject:"Hey",
-      body:"<h1>Hi</h1>",
-      sender:"community@inccrew.com",
-      recipient:"hitarasigan0987654321@gmail.com",
-      date_time:"2023-12-11T17:18:00.000Z"
-    },
-    {
-      id:"63e7cdd1b8af1921c49dfad8",
-      status:"success",
-      subject:"Hey",
-      body:"<h1>Hi</h1>",
-      sender:"community@inccrew.com",
-      recipient:"hitarasigan0987654321@gmail.com",
-      date_time:"2023-12-11T17:18:00.000Z"
-    },
-    {
-      id:"63e7cdd1b8af1921c49dfad8",
-      status:"success",
-      subject:"Hey",
-      body:"<h1>Hi</h1>",
-      sender:"community@inccrew.com",
-      recipient:"hitarasigan0987654321@gmail.com",
-      date_time:"2023-12-11T17:18:00.000Z"
-    },
-    {
-      id:"63e7cdd1b8af1921c49dfad8",
-      status:"success",
-      subject:"Hey",
-      body:"<h1>Hi</h1>",
-      sender:"community@inccrew.com",
-      recipient:"hitarasigan0987654321@gmail.com",
-      date_time:"2023-12-11T17:18:00.000Z"
-    },
-    {
-      id:"63e7cdd1b8af1921c49dfad8",
-      status:"success",
-      subject:"Hey",
-      body:"<h1>Hi</h1>",
-      sender:"community@inccrew.com",
-      recipient:"hitarasigan0987654321@gmail.com",
-      date_time:"2023-12-11T17:18:00.000Z"
-    },
-    {
-      id:"63e7cdd1b8af1921c49dfad8",
-      status:"success",
-      subject:"Hey",
-      body:"<h1>Hi</h1>",
-      sender:"community@inccrew.com",
-      recipient:"hitarasigan0987654321@gmail.com",
-      date_time:"2023-12-11T17:18:00.000Z"
-    },
-    
-  ]);
+  const [data, setdata] = React.useState([]);
   const [toggle_data, settoggle_data] = React.useState(false);
   const [status, setstatus] = React.useState("");
   const [error, seterror] = React.useState(false);
@@ -133,20 +69,22 @@ function Tickets() {
   const [success, setsuccess] = React.useState(false);
   const [successmessage, setsuccessmessage] = React.useState("");
 
-  // useEffect(() => {
-  //   ticket_data(status).then((res) => {
-  //     console.log(res.data);
-  //     // 200 for success of the call
-  //     if (res?.status === 200) {
-  //       setshow(false);
-  //       if (res.data.data.length < 1) {
-  //         setshow(true);
-  //         // setshowimage(SadImage);
-  //         setshowmessage("You don't have any tickets currently");
-  //       } else {
-  //         setdata(res.data.data);
-  //       }
-  //     }
+  React.useEffect(() => {
+    // get all groups
+    get_mails()
+      .then((res) => {
+        if (res.data.status === "Success") {
+          setdata(res.data.data);
+        } else if (res.data.status === "Fail") {
+          seterror(true);
+          seterrormessage(res.data.message);
+        }
+      })
+      .catch((err) => {
+        seterror(true);
+        seterrormessage("Internal Server Error");
+      });
+  }, [toggle_data]);
 
   //     // 401 if the user already exist on the database
   //     else if (res?.status === 401) {

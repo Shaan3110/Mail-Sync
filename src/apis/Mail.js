@@ -21,3 +21,17 @@ export const send_mail = async (recipient,sender,subject,body,date) => {
         return error.response;
     }
 };
+
+export const get_mails = async () => {
+
+    try {
+        const response = await axios.post(
+              '/mail/get_mails', {
+                initiator:"admin"
+            });
+        return response;
+    } catch (error) {
+        console.log(error);
+        return error.response;
+    }
+};
